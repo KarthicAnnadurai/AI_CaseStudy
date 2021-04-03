@@ -1,0 +1,135 @@
+
+********** Activity knowledge **********
+
+@Occurences
+	..Events - About occurrences of events in an episode.
+			1) Which events occurred?
+				is_event(Evt)
+
+			2) When did events occur?
+				event_interval(Evt, Begin, End)
+
+	..Duration - About the length of events that occured in an episode.
+			1) What is the duration of events that occurred?
+				event_interval(Evt, Begin, End),
+				Duration is End - Begin.
+			
+			2) What is the longest event that occurred? #shortest - ShortestEvt
+				findall([Duration, Evt],
+				  (  event_interval(Evt, Begin, End),
+					 number(End),
+					 Duration is End - Begin
+				  ),
+				  Durations),
+				max_member([MaxDuration, LongestEvt], Durations)
+				
+@Participation
+	..Events - About the participation of objects in events.
+			1) Which objects participate in which action?
+				has_participant(Evt, Obj)
+				
+			2) What is the list of participants for each event?
+				is_action(Act),
+				findall(Obj,
+				  has_participant(Act, Obj),
+					Participants)
+			
+	..Object Types - About the the types of objects that participate in events.
+			1) What agent participated in events?
+				has_participant(Evt, Obj),
+				is_agent(Obj)
+				
+			2) What physical artifacts participated in events?
+				has_participant(Evt, Obj),
+				is_physical_artifact(Obj)
+				
+@Structure
+	..Action Phases - About how actions are composed into distinct phases.
+			1) What are the direct sub-events of an action?
+				is_action(Act),
+				findall(Sub,
+				  triple(Act, dul:hasConstituent, Sub),
+				  Phases)	
+			
+			2) What is the transitive sub-event closure of an action?
+				is_action(Act),
+				findall(Sub,
+				  transitive(triple(Act, dul:hasConstituent, Sub)),
+				  Phases).
+				
+@Conceptualization
+	..Tasks - About the tasks executed by an action.
+			1) Which actions execute a navigation task?
+				has_type(Tsk, soma:'Navigating'),
+				executes_task(Act, Tsk).	
+			
+			2) Which actions execute a grasping task?
+				has_type(Tsk, soma:'Grasping'),
+				executes_task(Act, Tsk).
+
+********** Environment Knowledge **********
+
+@Appearance
+	..Shapes - About the shape quality of objects.
+			1) What is the shape of objects?
+				object_shape(Obj, _, Shape, _, _).
+				
+			2) What are the shapes of the objects that participate in an action?
+				has_participant(Act, Obj),
+				object_shape(Obj, _, ShapeTerm, _, _).
+
+@Structure
+	..Components - About how objects in the environment are composed of components.
+			1) What are the direct parts of an object?
+				is_physical_artifact(Obj),
+				findall(Sub,
+				  triple(Obj, dul:hasComponent, Sub),
+				  Components).
+			2) What is the transitive sub-event closure of an action?
+				is_physical_artifact(Obj),
+				findall(Sub,
+				  transitive(triple(Obj, dul:hasComponent, Sub)),
+				  Components).		
+
+@Kinematics
+	..Structure - About how objects are composed of links and joints.
+			1) What is the base link of objects?
+				has_base_link(Obj, Link).
+				
+			2) What are the links connected via a revolute joint?
+				has_type(Joint, urdf:'RevoluteJoint'),
+				has_child_link(Joint, Child),
+				has_parent_link(Joint, Parent).				
+				  
+********** Agent Knowledge **********
+
+@Structure
+	..Components - About how agents are composed of components.
+			1) What are the direct parts of an agent?
+				is_agent(Agent),
+				setof(Part,
+				  triple(Agent, dul:hasComponent, Part),
+				  Components).
+			  
+			2) What is the transitive component closure of an agent?
+				is_agent(Agent),
+				setof(Part,
+				  transitive(triple(Agent, dul:hasComponent, Part)),
+				  Components).
+			  
+			3) How many parts does the agent have?  
+				is_agent(Agent),
+				setof(Part,
+				  transitive(triple(Agent, dul:hasComponent, Part)),
+				  Components),
+				length(Components, NumParts).
+				
+	..Structure - About how agent body parts are composed of links and joints.
+			1) What is the base link of components of the agent?
+				is_agent(Agent),
+				triple(Agent, dul:hasComponent, Part),
+				has_base_link(Part, Link).
+			2) What are the links connected via a revolute joint?
+				has_type(Joint, urdf:'RevoluteJoint'),
+				has_child_link(Joint, Child),
+				has_parent_link(Joint, Parent).
