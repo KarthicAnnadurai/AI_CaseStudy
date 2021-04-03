@@ -1,5 +1,7 @@
-# AI_CaseStudy
-MTech CSE - 2nd Semester - AI course - Case Study
+## MTech CSE - 2nd Semester - Artificial Intelligence - Case Study
+### Team Members: 
+* Karthic (2022118) 
+* Bharat (2022122)
 
 EASE - Everyday Activity Science and Engineering
 [link](https://ease-crc.org/)
